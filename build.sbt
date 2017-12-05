@@ -3,7 +3,7 @@ lazy val root = project.in( file( "." ) )
     .settings( Settings.common )
     .settings(
         libraryDependencies ++=
-            "com.android.support" % "support-annotations" % "26.0.1" % "compile" ::
+            "com.android.support" % "support-annotations" % "26.1.0" % "compile" ::
             Nil,
         name := "icon-spinner",
         publishArtifact in ( Compile, packageDoc ) := false
