@@ -6,24 +6,51 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class IconSpinnerAdapter extends ArrayAdapter<ItemSpinnable> {
+public class IconSpinnerAdapter extends BaseAdapter {
+    final private Context context;
 
-    private ItemSpinnable[] spinnerEntries;
+    final private ItemSpinnable[] spinnerEntries;
+
+    final private int itemPadding;
 
     public <E extends ItemSpinnable> IconSpinnerAdapter(
         Context context,
         E[] spinnerEntries ) {
-        super( context, R.layout.spinner_item, spinnerEntries );
-
+        this.context = context;
         this.spinnerEntries = spinnerEntries;
+        this.itemPadding = (int) context.getResources().getDimension(
+            R.dimen.icon_spinner_item_padding );
+    }
+
+    @Override
+    public int getCount() {
+        return spinnerEntries.length;
+    }
+
+    @Override
+    public Object getItem( int position ) {
+        return spinnerEntries[position];
+    }
+
+    @Override
+    public long getItemId( int position ) {
+        return position;
+    }
+
+    @Override
+    public boolean hasStableIds() {
+        return true;
     }
 
     @Override
     public View getDropDownView( int position, View view, ViewGroup parent ) {
-        return getCustomView( position, parent );
+        View item = getCustomView( position, parent );
+        item.setPadding( itemPadding, itemPadding, itemPadding, itemPadding );
+        return item;
     }
 
     @Override
@@ -34,23 +61,23 @@ public class IconSpinnerAdapter extends ArrayAdapter<ItemSpinnable> {
     private View getCustomView( int position, ViewGroup parent ) {
         ItemSpinnable item = spinnerEntries[position];
 
-        // Getting a LayoutInflater and inflating layouts based on subtitle
-        // availability
-        LayoutInflater inflater = (LayoutInflater) getContext()
-                        .getSystemService( Context.LAYOUT_INFLATER_SERVICE );
-        ViewGroup spinnerView = (ViewGroup) inflater.inflate( item
-                        .getSubtitle() != null ? R.layout.spinner_item
-                        : R.layout.spinner_item_no_sub, parent, false );
+        LayoutInflater inflater = LayoutInflater.from( context );
+        ViewGroup spinnerView = (ViewGroup) inflater.inflate(
+            R.layout.icon_spinner_item,
+            parent,
+            false );
 
         // Setting the title text
         TextView title = spinnerView.findViewById( R.id.title );
         title.setText( item.getTitle() );
 
-        // Setting the Subtitle, guarded by the if because the view is null when
-        // no Subtitle is set.
+        // Setting the subtitle text
+        TextView subTitle = spinnerView.findViewById( R.id.subtitle );
         if ( item.getSubtitle() != null ) {
-            TextView subTitle = spinnerView.findViewById( R.id.subtitle );
+            subTitle.setVisibility( View.VISIBLE );
             subTitle.setText( item.getSubtitle() );
+        } else {
+            subTitle.setVisibility( View.GONE );
         }
 
         // Setting the Image Drawable
